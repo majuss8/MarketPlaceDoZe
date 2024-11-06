@@ -14,7 +14,7 @@ const registerUser = async (nome, email, senha, idade, tipo) => {
   try {
     await user.signUp();
     alert("Cadastro realizado com sucesso!");
-    window.location.href = "login.html";
+    window.location.href = "../login/index.html";
   } catch (error) {
     alert("Erro ao cadastrar: " + error.message);
   }

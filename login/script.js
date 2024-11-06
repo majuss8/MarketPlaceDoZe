@@ -9,7 +9,7 @@ const checkAuth = () => {
   } else if (currentUser.get("tipo") === "vendedor") {
     window.location.href = "pagesSeller/products/index.html";
   } else {
-    window.location.href = "dashboard/index.html"; // Página principal para outros usuários
+    window.location.href = "../dashboard/index.html"; // Página principal para outros usuários
   }
 };
 // Função de login
@@ -24,7 +24,7 @@ function loginUser(email, password) {
         window.location.href = "dashboard/index.html"; // Aqui redireciona para o dashboard
       } else if (role === "vendedor") {
         // Redirecionar para o painel de CRUD dos produtos (Dashboard do Vendedor)
-        window.location.href = "pagesSeller/products/index.html"; // Aqui também redireciona para o dashboard
+        window.location.href = "../pagesSeller/products/index.html"; // Aqui também redireciona para o dashboard
       } else {
         console.error("Tipo de usuário desconhecido");
       }
