@@ -1,0 +1,275 @@
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+
+            <head>
+              <meta charset="UTF-8">
+              <title>Dashboard - Meus Produtos</title>
+              <!-- Bootstrap CSS -->
+              <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+              <!-- Parse SDK -->
+              <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+              <!-- Main JS -->
+              <script src="js/main.js" defer></script>
+              <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+            </head>
+
+            <body onload="initializeDashboard()">
+              <!-- Navbar -->
+              <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                  <a class="navbar-brand" href="index.html">Marketplace</a>
+                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
+                  <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                      <li class="nav-item">
+                        <a class="nav-link" href="cart.html">Carrinho</a>
+                      </li>
+                      <li class="nav-item">
+                        <button class="btn btn-link nav-link" onclick="logout()">Sair</button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <!-- Conteúdo Principal -->
+              <div class="container mt-5">
+                <h2 class="mb-4">Meus Produtos</h2>
+                <button class="btn btn-success mb-4" data-bs-toggle="modal" data-bs-target="#addProductModal">Adicionar Produto</button>
+
+                <!-- Grid de Cards de Produtos -->
+                <div class="row" id="productsGrid">
+                  <!-- Produtos serão inseridos aqui dinamicamente -->
+                </div>
+              </div>
+
+              <!-- Modal para Adicionar Produto -->
+              <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="addProductModalLabel">Adicionar Novo Produto</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <form id="addProductForm">
+                        <div class="mb-3">
+                          <label for="prodNome" class="form-label">Nome</label>
+                          <input type="text" class="form-control" id="prodNome" required>
+                        </div>
+                        <div class="mb-3">
+                          <label for="prodDescricao" class="form-label">Descrição</label>
+                          <textarea class="form-control" id="prodDescricao" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                          <label for="prodCategoria" class="form-label">Categoria</label>
+                          <input type="text" class="form-control" id="prodCategoria" required>
+                        </div>
+                        <div class="mb-3">
+                          <label for="prodPreco" class="form-label">Preço</label>
+                          <input type="number" class="form-control" id="prodPreco" required>
+                        </div>
+                        <div class="mb-3">
+                          <label for="prodQuantidade" class="form-label">Quantidade</label>
+                          <input type="number" class="form-control" id="prodQuantidade" required>
+                        </div>
+                        <div class="mb-3">
+                          <label for="prodImagem" class="form-label">Imagem</label>
+                          <input type="file" class="form-control" id="prodImagem" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Adicionar Produto</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modal para Editar Produto -->
+              <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                  <form id="editProductForm">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="editProductModalLabel">Editar Produto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                      </div>
+                      <div class="modal-body">
+                        <input type="hidden" id="editProductId">
+                        <div class="mb-3">
+                          <label for="editProdNome" class="form-label">Nome</label>
+                          <input type="text" class="form-control" id="editProdNome" required>
+                        </div>
+                        <div class="mb-3">
+                          <label for="editProdDescricao" class="form-label">Descrição</label>
+                          <textarea class="form-control" id="editProdDescricao" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                          <label for="editProdCategoria" class="form-label">Categoria</label>
+                          <input type="text" class="form-control" id="editProdCategoria" required>
+                        </div>
+                        <div class="mb-3">
+                          <label for="editProdPreco" class="form-label">Preço</label>
+                          <input type="number" class="form-control" id="editProdPreco" required min="0" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                          <label for="editProdQuantidade" class="form-label">Quantidade</label>
+                          <input type="number" class="form-control" id="editProdQuantidade" required min="0">
+                        </div>
+                        <div class="mb-3">
+                          <label for="editProdImagem" class="form-label">Imagem</label>
+                          <input type="file" class="form-control" id="editProdImagem" accept="image/*">
+                          <small class="form-text text-muted">Deixe vazio para manter a imagem atual.</small>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <script>
+                // Função para inicializar o dashboard
+                const initializeDashboard = async () => {
+                  const currentUser = Parse.User.current();
+                  if (!currentUser || currentUser.get("tipo") !== "vendedor") {
+                    window.location.href = "login.html";
+                    return;
+                  }
+                  fetchVendorProducts();
+                };
+
+                // Função para buscar produtos do vendedor
+                const fetchVendorProducts = async () => {
+                  const currentUser = Parse.User.current();  // Obtenha o usuário atual
+                  const Product = Parse.Object.extend("Product");
+                  const query = new Parse.Query(Product);
+                  query.equalTo("vendedorId", Parse.User.current());
+
+                  try {
+                    const results = await query.find();
+                    const productsGrid = document.getElementById("productsGrid");
+                    productsGrid.innerHTML = ""; // Limpa a grid
+
+                    results.forEach((product) => {
+                      const nome = product.get("nome");
+                      const descricao = product.get("descricao");
+                      const categoria = product.get("categoria");
+                      const preco = product.get("preco");
+                      const quantidade = product.get("quantidade");
+                      const imagem = product.get("imagem") ? product.get("imagem").url() : "https://via.placeholder.com/150";
+                      const id = product.id;
+
+                      const card = document.createElement("div");
+                      card.classList.add("col-md-4", "mb-4");
+                      card.innerHTML = `
+                        <div class="card">
+                          <img src="${imagem}" class="card-img-top" alt="${nome}">
+                          <div class="card-body">
+                            <h5 class="card-title">${nome}</h5>
+                            <p class="card-text">${descricao}</p>
+                            <p><strong>Categoria:</strong> ${categoria}</p>
+                            <p><strong>Preço:</strong> R$ ${preco.toFixed(2)}</p>
+                            <p><strong>Quantidade:</strong> ${quantidade}</p>
+                            <div class="d-flex justify-content-between">
+                              <div>
+                                <!-- Botão de CRUD para o vendedor -->
+                                <button class="btn btn-sm btn-primary" onclick="openEditModal('${id}')">Editar</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteProduct('${id}')">Excluir</button>
+                              </div>
+                              <div>
+                                <!-- Botão de adicionar ao carrinho para o cliente -->
+                                ${currentUser.get("tipo") !== "vendedor" ? `<button class="btn btn-sm btn-success" onclick="addToCart('${id}')">Adicionar ao Carrinho</button>` : ""}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      `;
+                      productsGrid.appendChild(card);
+                    });
+                  } catch (error) {
+                    console.error("Erro ao carregar produtos: ", error);
+                  }
+                };
+
+
+                // Função para adicionar produto
+                const addProduct = async (nome, descricao, categoria, preco, quantidade, imagemFile) => {
+                  const Product = Parse.Object.extend("Product");
+                  const product = new Product();
+
+                  product.set("nome", nome);
+                  product.set("descricao", descricao);
+                  product.set("categoria", categoria);
+                  product.set("preco", parseFloat(preco));
+                  product.set("quantidade", parseInt(quantidade));
+
+                  // Enviar imagem para Parse Server (se houver)
+                  if (imagemFile) {
+                    const file = new Parse.File(imagemFile.name, imagemFile);
+                    try {
+                      await file.save();
+                      console.log("Imagem salva com sucesso:", file.url()); // Verificar se a imagem foi salva corretamente
+                      product.set("imagem", file);
+                    } catch (error) {
+                      console.error("Erro ao salvar imagem:", error);
+                      alert("Erro ao salvar imagem. Tente novamente.");
+                      return; // Impede que o produto seja salvo sem imagem
+                    }
+                  }
+
+                  product.set("vendedorId", Parse.User.current());
+
+                  try {
+                    // Tente salvar o produto no banco de dados
+                    const savedProduct = await product.save();
+                    console.log("Produto adicionado com sucesso:", savedProduct);
+
+                    // Verifique se o produto foi salvo corretamente
+                    if (savedProduct) {
+                      console.log("Produto foi salvo com sucesso no banco de dados!");
+                      alert("Produto adicionado com sucesso!");
+
+                      // Fechar o modal utilizando o Bootstrap 5 sem jQuery
+                      const addProductModal = new bootstrap.Modal(document.getElementById('addProductModal'));
+                      addProductModal.hide();  // Fechar o modal corretamente
+
+                      fetchVendorProducts(); // Atualizar a lista de produtos
+                    } else {
+                      throw new Error("Produto não foi salvo corretamente.");
+                    }
+                  } catch (error) {
+                    // Captura qualquer erro que ocorrer durante o processo de salvar o produto
+                    console.error("Erro ao adicionar produto:", error);
+                    alert("Ocorreu um erro ao adicionar o produto. Tente novamente.");
+                  }
+                };
+
+
+                // Enviar o formulário de adicionar produto
+                document.getElementById("addProductForm").addEventListener("submit", (e) => {
+                  e.preventDefault(); // Impede o comportamento padrão de envio do formulário
+
+                  const nome = document.getElementById("prodNome").value;
+                  const descricao = document.getElementById("prodDescricao").value;
+                  const categoria = document.getElementById("prodCategoria").value;
+                  const preco = document.getElementById("prodPreco").value;
+                  const quantidade = document.getElementById("prodQuantidade").value;
+                  const imagemFile = document.getElementById("prodImagem").files[0];
+
+                  addProduct(nome, descricao, categoria, preco, quantidade, imagemFile);
+                });
+              </script>
+
+              <!-- Bootstrap JS -->
+              <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            </body>
+
+            </html>

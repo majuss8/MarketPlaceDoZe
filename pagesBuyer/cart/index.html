@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Carrinho - Marketplace</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Parse SDK -->
+  <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+  <!-- Main JS -->
+  <script src="js/main.js" defer></script>
+</head>
+
+<body onload="initializeCart()">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">Marketplace</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <button class="btn btn-link nav-link" onclick="logout()">Sair</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Conteúdo Principal -->
+  <div class="container mt-5">
+    <h2 class="mb-4">Seu Carrinho</h2>
+    <div class="table-responsive">
+      <table class="table table-striped" id="cartTable">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Preço</th>
+            <th>Quantidade</th>
+            <th>Total</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Itens do carrinho serão inseridos aqui dinamicamente -->
+        </tbody>
+      </table>
+    </div>
+    <h4 id="totalAmount">Total: R$ 0,00</h4>
+    <button class="btn btn-success mt-3" onclick="checkout()">Finalizar Pedido</button>
+  </div>
+
+  <script>
+    // Função para inicializar o carrinho
+    const initializeCart = async () => {
+      const currentUser = Parse.User.current();
+      if (!currentUser) {
+        window.location.href = "login.html";
+        return;
+      }
+      renderCart();
+    };
+
+    // Função para renderizar o carrinho
+    const renderCart = async () => {
+      const cart = JSON.parse(localStorage.getItem("cart")) || {};
+      const productIds = Object.keys(cart);
+
+      if (productIds.length === 0) {
+        document.getElementById("cartTable").getElementsByTagName('tbody')[0].innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center">Seu carrinho está vazio.</td>
+          </tr>
+        `;
+        document.getElementById("totalAmount").innerText = "Total: R$ 0,00";
+        return;
+      }
+
+      const Product = Parse.Object.extend("Product");
+      const query = new Parse.Query(Product);
+      query.containedIn("objectId", productIds);
+
+      try {
+        const products = await query.find();
+        const cartTableBody = document.getElementById("cartTable").getElementsByTagName('tbody')[0];
+        cartTableBody.innerHTML = ""; // Limpa a tabela
+
+        let total = 0;
+
+        products.forEach((product) => {
+          const id = product.id;
+          const nome = product.get("nome");
+          const preco = product.get("preco");
+          const quantidade = cart[id];
+          const totalItem = preco * quantidade;
+          total += totalItem;
+
+          const row = cartTableBody.insertRow();
+
+          row.innerHTML = `
+            <td>${nome}</td>
+            <td>R$ ${preco.toFixed(2)}</td>
+            <td>
+              <input type="number" min="1" value="${quantidade}" class="form-control form-control-sm" 
+                     onchange="updateQuantity('${id}', this.value)">
+            </td>
+            <td>R$ ${totalItem.toFixed(2)}</td>
+            <td>
+              <button class="btn btn-sm btn-danger" onclick="removeFromCart('${id}')">Remover</button>
+            </td>
+          `;
+        });
+
+        document.getElementById("totalAmount").innerText = `Total: R$ ${total.toFixed(2)}`;
+      } catch (error) {
+        console.error("Erro ao buscar produtos do carrinho:", error);
+        alert("Erro ao carregar carrinho.");
+      }
+    };
+
+    // Função para atualizar a quantidade de um item no carrinho
+    const updateQuantity = (productId, newQuantity) => {
+      let cart = JSON.parse(localStorage.getItem("cart")) || {};
+      if (newQuantity < 1) {
+        delete cart[productId];
+      } else {
+        cart[productId] = parseInt(newQuantity);
+      }
+      localStorage.setItem("cart", JSON.stringify(cart));
+      renderCart();
+    };
+
+    // Função para remover um item do carrinho
+    const removeFromCart = (productId) => {
+      let cart = JSON.parse(localStorage.getItem("cart")) || {};
+      delete cart[productId];
+      localStorage.setItem("cart", JSON.stringify(cart));
+      renderCart();
+    };
+
+    // Função para finalizar o pedido
+    const checkout = async () => {
+      const cart = JSON.parse(localStorage.getItem("cart")) || {};
+      const productIds = Object.keys(cart);
+
+      if (productIds.length === 0) {
+        alert("Seu carrinho está vazio.");
+        return;
+      }
+
+      const Product = Parse.Object.extend("Product");
+      const query = new Parse.Query(Product);
+      query.containedIn("objectId", productIds);
+
+      try {
+        const products = await query.find();
+        let mensagem = "Pedido:%0A";
+        let total = 0;
+
+        products.forEach((product) => {
+          const id = product.id;
+          const nome = product.get("nome");
+          const preco = product.get("preco");
+          const quantidade = cart[id];
+          const totalItem = preco * quantidade;
+          total += totalItem;
+          mensagem += `Produto: ${nome} - Quantidade: ${quantidade} - Total: R$ ${totalItem.toFixed(2)}%0A`;
+        });
+
+        mensagem += `Total Geral: R$ ${total.toFixed(2)}`;
+
+        const numeroGustavo = "5511999999999"; // Substitua pelo número correto
+        const linkWhatsApp = `https://wa.me/${numeroGustavo}?text=${mensagem}`;
+        window.open(linkWhatsApp, "_blank");
+      } catch (error) {
+        console.error("Erro ao finalizar pedido:", error);
+        alert("Erro ao finalizar pedido.");
+      }
+    };
+  </script>
+</body>
+
+</html>

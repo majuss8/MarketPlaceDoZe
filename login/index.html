@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Marketplace</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Parse SDK -->
+  <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+  <!-- Main JS -->
+  <script src="js/main.js" defer></script>
+</head>
+
+<body>
+  <div class="container mt-5">
+    <h2 class="mb-4">Login</h2>
+    <form id="loginForm">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" required>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Senha</label>
+        <input type="password" class="form-control" id="password" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Entrar</button>
+      <p class="mt-3">Ainda não tem uma conta? <a href="register.html">Cadastre-se</a></p>
+    </form>
+  </div>
+
+  <script>
+    // Configuração do Parse
+    Parse.initialize("uN5Y1aXedE7dEvVvTUbpVSU6nuFBVSNpBVd550kz", "1VeLKickMsxP0RMsuxk7qJu7yKlxnDizSRFsS9P7");
+    Parse.serverURL = "https://parseapi.back4app.com";
+
+    // Função de login
+    // Função de login
+    function loginUser(email, password) {
+      Parse.User.logIn(email, password)
+        .then((user) => {
+          // Verifique o tipo de usuário
+          const role = user.get("tipo"); // Assumindo que o campo se chama "role"
+
+          if (role === "cliente") {
+            // Redirecionar para a página de produtos para compra (Dashboard do Cliente)
+            window.location.href = "dashboard.html"; // Aqui redireciona para o dashboard
+          } else if (role === "vendedor") {
+            // Redirecionar para o painel de CRUD dos produtos (Dashboard do Vendedor)
+            window.location.href = "dashboard.html"; // Aqui também redireciona para o dashboard
+          } else {
+            console.error("Tipo de usuário desconhecido");
+          }
+        })
+        .catch((error) => {
+          console.error("Erro no login:", error.message);
+          alert("Erro no login: " + error.message);
+        });
+    }
+
+
+
+    // Event Listener para o formulário de login
+    document.getElementById("loginForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      loginUser(email, password);
+    });
+  </script>
+</body>
+
+</html>
