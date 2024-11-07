@@ -5,9 +5,9 @@ Parse.serverURL = "https://parseapi.back4app.com";
 const checkAuth = () => {
   const currentUser = Parse.User.current();
   if (!currentUser) {
-    window.location.href = "register/index.html";
+    window.location.href = "../register/index.html";
   } else if (currentUser.get("tipo") === "vendedor") {
-    window.location.href = "pagesSeller/products/index.html";
+    window.location.href = "../pagesSeller/products/index.html";
   } else {
     window.location.href = "../dashboard/index.html"; // Página principal para outros usuários
   }
@@ -21,7 +21,7 @@ function loginUser(email, password) {
 
       if (role === "cliente") {
         // Redirecionar para a página de produtos para compra (Dashboard do Cliente)
-        window.location.href = "dashboard/index.html"; // Aqui redireciona para o dashboard
+        window.location.href = "../dashboard/index.html"; // Aqui redireciona para o dashboard
       } else if (role === "vendedor") {
         // Redirecionar para o painel de CRUD dos produtos (Dashboard do Vendedor)
         window.location.href = "../pagesSeller/products/index.html"; // Aqui também redireciona para o dashboard
@@ -51,7 +51,7 @@ const logout = async () => {
   try {
     await Parse.User.logOut();
     alert("Deslogado com sucesso!");
-    window.location.href = "login/index.html";
+    window.location.href = "../login/index.html";
   } catch (error) {
     alert("Erro ao deslogar: " + error.message);
   }
