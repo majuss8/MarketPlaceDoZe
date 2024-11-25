@@ -4,10 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página Inicial</title>
+    <!-- Parse SDK -->
+    <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
 </head>
 <body>
     <script>
-        window.location.href = "login/index.html";
+        // Inicialização do Parse
+        Parse.initialize("uN5Y1aXedE7dEvVvTUbpVSU6nuFBVSNpBVd550kz", "1VeLKickMsxP0RMsuxk7qJu7yKlxnDizSRFsS9P7");
+        Parse.serverURL = "https://parseapi.back4app.com";
+
+        // Verifica a autenticação e redireciona conforme o tipo de usuário
+        const checkAuth = async () => {
+            const currentUser = Parse.User.current();
+
+            if (!currentUser) {
+                // Usuário não está logado, redireciona para login
+                window.location.href = "login/index.html";
+                return;
+            }
+
+            try {
+                // Valida a sessão no servidor
+                const query = new Parse.Query(Parse.Session);
+                query.equalTo("sessionToken", currentUser.getSessionToken());
+                const session = await query.first();
+
+                if (!session) {
+                    // Sessão inválida ou expirada
+                    await Parse.User.logOut();
+                    window.location.href = "login/index.html";
+                    return;
+                }
+
+                // Sessão válida, redireciona conforme o tipo de usuário
+                const role = currentUser.get("tipo");
+                if (role === "vendedor") {
+                    window.location.href = "pagesSeller/products/index.html";
+                } else {
+                    window.location.href = "dashboard/index.html";
+                }
+            } catch (error) {
+                console.error("Erro ao verificar sessão:", error.message);
+                // Redireciona para login em caso de erro
+                await Parse.User.logOut();
+                window.location.href = "login/index.html";
+            }
+        };
+
+        // Chama a função de verificação ao carregar a página
+        checkAuth();
     </script>
 </body>
 </html>

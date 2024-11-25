@@ -93,13 +93,19 @@ const addProduct = async (nome, descricao, categoria, preco, quantidade, imagemF
     }
   }
 
+  // Modifique esta parte da função de adicionar produto
   try {
     const savedProduct = await product.save();
     if (savedProduct) {
       console.log("Produto adicionado com sucesso:", savedProduct);
       alert("Produto adicionado com sucesso!");
-      const addProductModal = new bootstrap.Modal(document.getElementById('addProductModal'));
-      addProductModal.hide();
+
+      // Obtém a instância do modal e o fecha
+      const addProductModal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
+      if (addProductModal) {
+        addProductModal.hide();
+      }
+
       fetchVendorProducts();
     } else {
       throw new Error("Produto não foi salvo corretamente.");
@@ -108,6 +114,7 @@ const addProduct = async (nome, descricao, categoria, preco, quantidade, imagemF
     console.error("Erro ao adicionar produto:", error);
     alert("Ocorreu um erro ao adicionar o produto. Tente novamente.");
   }
+
 };
 
 // Enviar o formulário de adicionar produto
