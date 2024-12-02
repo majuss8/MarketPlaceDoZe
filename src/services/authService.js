@@ -1,4 +1,4 @@
-import { Parse } from '../utils/api.js';
+import Parse from 'parse';
 
 // Função de Login
 async function login(email, password) {

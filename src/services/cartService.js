@@ -1,4 +1,4 @@
-import { Parse } from '../utils/api.js';
+import Parse from 'parse';
 
 // Função para adicionar um item ao carrinho
 async function addToCart(productId) {

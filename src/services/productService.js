@@ -1,4 +1,4 @@
-import { Parse } from '../utils/api.js';
+import Parse from 'parse';
 
 // Função para obter todos os produtos (visíveis para todos os usuários)
 async function getProducts() {
