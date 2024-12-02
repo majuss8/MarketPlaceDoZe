@@ -11,7 +11,7 @@ const fetchAllProducts = async () => {
   const currentUser = await Parse.User.currentAsync();  // Obtém o usuário atual de forma assíncrona
   if (!currentUser) {
     alert("Você precisa estar logado para ver os produtos.");
-    window.location.href = "../../login/index.html";  // Se não estiver logado, redireciona para a página de login
+    window.location.href = "../login/index.html";  // Se não estiver logado, redireciona para a página de login
     return;
   }
 
@@ -74,7 +74,7 @@ const addToCart = (productId) => {
 // Função de logout
 const logout = async () => {
   await Parse.User.logOut();
-  window.location.href = "../../login/index.html";
+  window.location.href = "../login/index.html";
 };
 
-window.onload = initializeDashboard;
+window.onload = initializeDashboard();

@@ -8,7 +8,7 @@ function showError(message) {
   errorMessage.textContent = message;
   errorMessage.style.display = "block";
 }
-
+ 
 // Função para verificar se o usuário está autenticado
 const checkAuth = async () => {
   try {
