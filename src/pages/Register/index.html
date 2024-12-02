@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="styles/main.css" rel="stylesheet">
+</head>
+<body>
+  <div id="navbar-placeholder"></div> <!-- Componente Navbar -->
+
+  <div class="container">
+    <h1>Cadastro</h1>
+    <form id="register-form">
+      <div class="form-group">
+        <label for="name">Nome</label>
+        <input type="text" class="form-control" id="name" placeholder="Digite seu nome" required>
+      </div>
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" class="form-control" id="email" placeholder="Digite seu e-mail" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input type="password" class="form-control" id="password" placeholder="Digite sua senha" required>
+      </div>
+      <div class="form-group">
+        <label for="confirm-password">Confirmar Senha</label>
+        <input type="password" class="form-control" id="confirm-password" placeholder="Confirme sua senha" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Cadastrar</button>
+    </form>
+  </div>
+
+  <script src="scripts/register.js"></script> <!-- Script da lógica de cadastro -->
+</body>
+</html>
