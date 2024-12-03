@@ -20,113 +20,113 @@ const fetchVendorProducts = async () => {
 
   try {
     const results = await query.find();
-    console.log("Produtos retornados:", results);  // Verificar os resultados da query
+    console.log("Produtos retornados:", results);
+
     const productsGrid = document.getElementById("productsGrid");
-    productsGrid.innerHTML = "";  // Limpar a grid antes de renderizar
+    productsGrid.innerHTML = ""; // Limpar a grade
+
+    if (results.length === 0) {
+      productsGrid.innerHTML = "<p>Nenhum produto encontrado.</p>";
+    }
 
     results.forEach((product) => {
-      const nome = product.get("nome");
-      const descricao = product.get("descricao");
-      const categoria = product.get("categoria");
-      const preco = product.get("preco");
-      const quantidade = product.get("quantidade");
-      const imagem = product.get("imagem") ? product.get("imagem").url() : "https://via.placeholder.com/150";
-      const id = product.id;
-
-      const card = document.createElement("div");
-      card.classList.add("col-md-4", "mb-4");
-      card.innerHTML = `
-        <div class="card">
-          <img src="${imagem}" class="card-img-top" alt="${nome}">
-          <div class="card-body">
-            <h5 class="card-title">${nome}</h5>
-            <p class="card-text">${descricao}</p>
-            <p><strong>Categoria:</strong> ${categoria}</p>
-            <p><strong>Preço:</strong> R$ ${preco.toFixed(2)}</p>
-            <p><strong>Quantidade:</strong> ${quantidade}</p>
-            <div class="d-flex justify-content-between">
-              <div>
-                <button class="btn btn-sm btn-primary" onclick="openEditModal('${id}')">Editar</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteProduct('${id}')">Excluir</button>
-              </div>
-              <div>
-                ${currentUser.get("tipo") !== "vendedor" ? `<button class="btn btn-sm btn-success" onclick="addToCart('${id}')">Adicionar ao Carrinho</button>` : ""}
-              </div>
+      const productCard = `
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <img src="${product.get("imagem") ? product.get("imagem").url() : 'default-image.jpg'}" class="card-img-top" alt="Imagem do Produto">
+            <div class="card-body">
+              <h5 class="card-title">${product.get("nome")}</h5>
+              <p class="card-text">${product.get("descricao")}</p>
+              <p class="card-text"><strong>Categoria:</strong> ${product.get("categoria")}</p>
+              <p class="card-text"><strong>Preço:</strong> R$${product.get("preco").toFixed(2)}</p>
+              <p class="card-text"><strong>Quantidade:</strong> ${product.get("quantidade")}</p>
+              <button class="btn btn-primary btn-sm" onclick="openEditModal('${product.id}')">Editar</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteProduct('${product.id}')">Excluir</button>
             </div>
           </div>
         </div>
       `;
-      productsGrid.appendChild(card);
+
+      productsGrid.innerHTML += productCard;
     });
   } catch (error) {
-    console.error("Erro ao carregar produtos:", error);
+    console.error("Erro ao buscar produtos:", error);
+    alert("Erro ao carregar os produtos. Tente novamente.");
   }
 };
 
-// Função para adicionar produto
-const addProduct = async (nome, descricao, categoria, preco, quantidade, imagemFile) => {
+// Função para abrir o modal de edição com os dados do produto
+const openEditModal = async (productId) => {
   const Product = Parse.Object.extend("Product");
-  const product = new Product();
+  const query = new Parse.Query(Product);
 
-  product.set("nome", nome);
-  product.set("descricao", descricao);
-  product.set("categoria", categoria);
-  product.set("preco", parseFloat(preco));
-  product.set("quantidade", parseInt(quantidade));
-
-  // Obter o usuário atual
-  const currentUser = await Parse.User.currentAsync();
-
-  // Atribuir o Pointer do usuário ao vendedorId
-  product.set("vendedorId", currentUser);
-
-  if (imagemFile) {
-    const file = new Parse.File(imagemFile.name, imagemFile);
-    try {
-      await file.save();
-      console.log("Imagem salva com sucesso:", file.url());
-      product.set("imagem", file);
-    } catch (error) {
-      console.error("Erro ao salvar imagem:", error);
-      alert("Erro ao salvar imagem. Tente novamente.");
-      return;
-    }
-  }
-
-  // Modifique esta parte da função de adicionar produto
   try {
-    const savedProduct = await product.save();
-    if (savedProduct) {
-      console.log("Produto adicionado com sucesso:", savedProduct);
-      alert("Produto adicionado com sucesso!");
+    const product = await query.get(productId);
 
-      // Obtém a instância do modal e o fecha
-      const addProductModal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
-      if (addProductModal) {
-        addProductModal.hide();
-      }
+    // Preencher o modal com os dados do produto
+    document.getElementById("editProductId").value = product.id;
+    document.getElementById("editProdNome").value = product.get("nome");
+    document.getElementById("editProdDescricao").value = product.get("descricao");
+    document.getElementById("editProdCategoria").value = product.get("categoria");
+    document.getElementById("editProdPreco").value = product.get("preco");
+    document.getElementById("editProdQuantidade").value = product.get("quantidade");
 
-      fetchVendorProducts();
-    } else {
-      throw new Error("Produto não foi salvo corretamente.");
-    }
+    // Abrir o modal
+    const editModal = new bootstrap.Modal(document.getElementById("editProductModal"));
+    editModal.show();
   } catch (error) {
-    console.error("Erro ao adicionar produto:", error);
-    alert("Ocorreu um erro ao adicionar o produto. Tente novamente.");
+    console.error("Erro ao abrir modal de edição:", error);
+    alert("Erro ao carregar os dados do produto. Tente novamente.");
   }
-
 };
 
-// Enviar o formulário de adicionar produto
-document.getElementById("addProductForm").addEventListener("submit", (e) => {
-  e.preventDefault();
+// Função para salvar alterações do produto
+document.getElementById("editProductForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-  const nome = document.getElementById("prodNome").value;
-  const descricao = document.getElementById("prodDescricao").value;
-  const categoria = document.getElementById("prodCategoria").value;
-  const preco = document.getElementById("prodPreco").value;
-  const quantidade = document.getElementById("prodQuantidade").value;
-  const imagemFile = document.getElementById("prodImagem").files[0];
+  const productId = document.getElementById("editProductId").value;
+  const Product = Parse.Object.extend("Product");
+  const query = new Parse.Query(Product);
 
-  addProduct(nome, descricao, categoria, preco, quantidade, imagemFile);
+  try {
+    const product = await query.get(productId);
+
+    // Atualizar os valores
+    product.set("nome", document.getElementById("editProdNome").value);
+    product.set("descricao", document.getElementById("editProdDescricao").value);
+    product.set("categoria", document.getElementById("editProdCategoria").value);
+    product.set("preco", parseFloat(document.getElementById("editProdPreco").value));
+    product.set("quantidade", parseInt(document.getElementById("editProdQuantidade").value, 10));
+
+    // Salvar no Parse
+    await product.save();
+
+    // Atualizar a grade e fechar o modal
+    fetchVendorProducts();
+    bootstrap.Modal.getInstance(document.getElementById("editProductModal")).hide();
+    alert("Produto atualizado com sucesso!");
+  } catch (error) {
+    console.error("Erro ao salvar alterações:", error);
+    alert("Erro ao salvar as alterações. Tente novamente.");
+  }
 });
+
+// Função para excluir um produto
+const deleteProduct = async (productId) => {
+  const Product = Parse.Object.extend("Product");
+  const query = new Parse.Query(Product);
+
+  try {
+    const product = await query.get(productId);
+
+    // Deletar o produto
+    await product.destroy();
+
+    // Atualizar a grade
+    fetchVendorProducts();
+    alert("Produto excluído com sucesso!");
+  } catch (error) {
+    console.error("Erro ao excluir produto:", error);
+    alert("Erro ao excluir o produto. Tente novamente.");
+  }
+};
