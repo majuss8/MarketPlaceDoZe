@@ -130,3 +130,14 @@ const deleteProduct = async (productId) => {
     alert("Erro ao excluir o produto. Tente novamente.");
   }
 };
+
+// Função para logout
+const logout = async () => {
+  try {
+    await Parse.User.logOut();
+    alert("Deslogado com sucesso!");
+    window.location.href = "../../login/index.html";
+  } catch (error) {
+    alert("Erro ao deslogar: " + error.message);
+  }
+};
