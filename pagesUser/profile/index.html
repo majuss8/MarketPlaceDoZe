@@ -6,6 +6,7 @@
   <title>Profile</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
   <!-- Parse SDK -->
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
   <!-- Script JS -->
@@ -15,7 +16,7 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-      <a class="navbar-brand" href="index.html">Zé Marketplace</a>
+      <a class="navbar-brand" href="../../dashboard/index.html">Zé Marketplace</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -26,11 +27,59 @@
             <button class="btn btn-link nav-link" onclick="logout()">Sair</button>
           </li>
           <li class="nav-item">
-            <a href='../../dashboard/index.html'><button a class="btn btn-link nav-link">Dashboard</button></a>
+            <button class="btn btn-link nav-link" id="dashboardButton">Dashboard</button>
           </li>
         </ul>
       </div>
     </div>
   </nav>
+  <div class="container mt-5">
+    <h2 class="mb-4">Perfil</h2>
+    <form id="registerForm">
+      <div class="mb-3">
+        <label for="nome" class="form-label">Nome</label>
+        <input type="text" class="form-control" id="nome" required>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" required>
+      </div>
+      <div class="mb-3">
+        <label for="senha" class="form-label">Senha</label>
+        <input type="password" class="form-control" id="senha" required>
+      </div>
+      <div class="mb-3">
+        <label for="idade" class="form-label">Idade</label>
+        <input type="number" class="form-control" id="idade" required min="0">
+      </div>
+      <div class="mb-3">
+        <label for="telefone" class="form-label">Telefone</label>
+        <input type="number" class="form-control" id="telefone" required>
+      </div>
+      <div class="mb-3">
+        <label for="tipo" class="form-label">Tipo de Usuário</label>
+        <select class="form-select" id="tipo" required>
+          <option value="" selected disabled>Selecione</option>
+          <option value="cliente">Cliente</option>
+          <option value="vendedor">Vendedor</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Editar</button>
+    </form>
+  </div>
+
+  <script>
+    // Função para redirecionar dependendo do tipo de usuário
+    document.getElementById('dashboardButton').addEventListener('click', function() {
+      var tipoUsuario = document.getElementById('tipo').value; // Pega o tipo de usuário selecionado
+      if (tipoUsuario === 'cliente') {
+        window.location.href = '../../dashboard/index.html'; // Redireciona para o dashboard do cliente
+      } else if (tipoUsuario === 'vendedor') {
+        window.location.href = '../../pagesSeller/products/index.html'; // Redireciona para o dashboard do vendedor
+      } else {
+        alert('Por favor, selecione o tipo de usuário primeiro.'); // Caso o tipo não tenha sido selecionado
+      }
+    });
+  </script>
 </body>
 </html>
