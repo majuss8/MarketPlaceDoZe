@@ -27,7 +27,7 @@
             <button class="btn btn-link nav-link" onclick="logout()">Sair</button>
           </li>
           <li class="nav-item">
-            <a href='../../dashboard/index.html'><button a class="btn btn-link nav-link"">Dashboard</button></a>
+            <button class="btn btn-link nav-link" id="dashboardButton">Dashboard</button>
           </li>
         </ul>
       </div>
@@ -67,5 +67,19 @@
       <button type="submit" class="btn btn-primary">Editar</button>
     </form>
   </div>
+
+  <script>
+    // Função para redirecionar dependendo do tipo de usuário
+    document.getElementById('dashboardButton').addEventListener('click', function() {
+      var tipoUsuario = document.getElementById('tipo').value; // Pega o tipo de usuário selecionado
+      if (tipoUsuario === 'cliente') {
+        window.location.href = '../../dashboard/index.html'; // Redireciona para o dashboard do cliente
+      } else if (tipoUsuario === 'vendedor') {
+        window.location.href = '../../pagesSeller/products/index.html'; // Redireciona para o dashboard do vendedor
+      } else {
+        alert('Por favor, selecione o tipo de usuário primeiro.'); // Caso o tipo não tenha sido selecionado
+      }
+    });
+  </script>
 </body>
 </html>
